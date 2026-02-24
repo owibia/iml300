@@ -1,0 +1,18 @@
+h1 {
+    padding-left: 10px;
+}
+
+p {
+    padding-left: 10px;
+}
+
+img {
+  height: 550px;
+  border-radius: 20px;
+  padding: 10px;
+  transition: 1s;
+}
+
+img:hover {
+  height: 700px;
+}
