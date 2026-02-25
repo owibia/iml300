@@ -25,7 +25,7 @@ img:hover {
   background-image: linear-gradient(to right, rgb(255, 0, 157), rgb(0, 255, 55));
 }
 
-#container:hover {
+.container:hover {
   font-family: 'Courier New', Courier, monospace;
   border: 1px solid red;
   background-color: coral;
