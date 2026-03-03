@@ -1,12 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css"/>
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style-2.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      p {
+        animation:
+          typing 6s steps(51, end) forwards,
+          blink-caret 0.75s step-end infinite;
+
+        letter-spacing: 0.15em;
+        width: 51ch;
+      }
+
+      @keyframes typing {
+        0% {
+          width: 0;
+        }
+        60% {
+          width: 37ch;
+        }
+        80% {
+          width: 37ch;
+        }
+        100% {
+          width: 51ch;
+        }
+      }
+
+      @keyframes blink-caret {
+        from,
+        to {
+          border-color: transparent;
+        }
+        50% {
+          border-color: rgb(255, 255, 255);
+        }
+      }
+
+      @keyframes button-blink {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .circle-button {
+        position: fixed;
+        right: 50px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 60px;
+        height: 60px;
+        background-color: white;
+        border-radius: 50%;
+        cursor: pointer;
+
+        animation: button-blink 1.5s ease-in-out infinite;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 2s ease-in-out;
+      }
+
+      .show-button {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+    <title>error</title>
+  </head>
+  <body>
+    <div class="error">
+      <p>[you scroll through the messages. you pause...]</p>
+    </div>
+    <a href="page-6.html">
+      <button class="circle-button"></button>
+    </a>
+
+    <script>
+      window.addEventListener("load", () => {
+        const buttonLink = document.querySelector(".circle-button");
+
+        setTimeout(() => {
+          buttonLink.classList.add("show-button");
+        }, 7000);
+      });
+    </script>
+  </body>
 </html>

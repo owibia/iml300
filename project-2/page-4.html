@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style-2.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      p {
+        animation:
+          typing 3s steps(27, end) forwards,
+          blink-caret 0.75s step-end infinite;
+
+        letter-spacing: 0.15em;
+        width: 27ch;
+      }
+
+      @keyframes typing {
+        from {
+          width: 0;
+        }
+        to {
+          width: 27ch;
+        }
+      }
+
+      @keyframes blink-caret {
+        from,
+        to {
+          border-color: transparent;
+        }
+        50% {
+          border-color: rgb(255, 255, 255);
+        }
+      }
+    </style>
+    <title>error</title>
+  </head>
+  <body>
+    <div class="error">
+      <p>
+        I want to see them
+        <a href="index.html" style="color: rgb(25, 25, 255)">again.</a>
+      </p>
+    </div>
+  </body>
+</html>
