@@ -1,3 +1,27 @@
+<!-- IML 300 Project 2: Non-Linear Narrative -- Olivia Dien -->
+
+<!-- This project was inspired by the feeling of missed connections. 
+  The narrative follows someone who reminisces about a relationship they 
+  didn't have the energy to maintain. Towards the end, the character has 
+  more energy to reach out, but by then it's too late. -->
+
+<!-- In the future, I want to continue adding more layers to this narrative
+  to make it more non-linear. I also would like to condense my CSS since there
+  is some overlap across the pages and there is probably a more efficient way 
+  to organize my code. -->
+
+<!-- AI STATEMENT -->
+<!-- AI was used to debug a majority of the JavaScript code and some of 
+  the CSS animations. Some of the prompts used were as follows: -->
+
+<!-- How can I create pauses and delays in my text animation and sound? -->
+<!-- How can I make the audio autoplay? -->
+<!-- How can I create a button that runs away from the user's cursor?-->
+
+<!-- The text glitch animation was sourced from FreeFrontend.com and translated
+  to pure CSS with AI.-->
+<!-- https://codepen.io/cbp/pen/RaEOaj/ -->
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -34,6 +58,8 @@
           container.classList.add("show-button");
         }, 4300);
       });
+
+      // start of AI code
 
       let posX = 0,
         posY = 0;
@@ -75,6 +101,8 @@
           velY += Math.sin(angle) * force;
         }
       });
+
+      // End of AI code
     </script>
   </body>
 </html>

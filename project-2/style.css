@@ -6,20 +6,21 @@ body {
     min-height: 100vh;
     background-color: rgb(0, 0, 0);
 }
+
 .pixel {
-  font-family: "Pixelify Sans", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "Pixelify Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .rooms {
-  font-family: "Pixelify Sans", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 40px;
-  color: gray;
+    font-family: "Pixelify Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 40px;
+    color: gray;
 }
 
 .people {
@@ -49,7 +50,10 @@ body {
     background-image: linear-gradient(to top, rgb(100, 170, 191), white)
 }
 
-#room-a, #room-b, #room-c, #room-d {
+#room-a,
+#room-b,
+#room-c,
+#room-d {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -59,7 +63,10 @@ body {
     outline: 3px solid black;
 }
 
-#room-a:hover, #room-b:hover, #room-c:hover, #room-d:hover  {
+#room-a:hover,
+#room-b:hover,
+#room-c:hover,
+#room-d:hover {
     transform: scale(1.03);
 }
 

@@ -21,10 +21,10 @@ body {
 }
 
 .corrupted {
-  color: #ff0000;
-  font-weight: bold;
-  text-decoration: none;
-  animation: none;
+    color: #ff0000;
+    font-weight: bold;
+    text-decoration: none;
+    animation: none;
 }
 
 @keyframes pulse {
@@ -32,11 +32,13 @@ body {
         transform: scale(1);
         color: red;
     }
+
     50% {
         transform: scale(1.1);
         color: rgb(255, 90, 90);
         text-shadow: 0 0 15px red;
     }
+
     100% {
         transform: scale(1);
         color: red;
