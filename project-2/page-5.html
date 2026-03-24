@@ -21,10 +21,11 @@
       }
 
       @keyframes typing {
-        from {
+        0% {
           width: 0;
         }
-        to {
+
+        100% {
           width: 48ch;
         }
       }
@@ -42,12 +43,19 @@
     <title>error</title>
   </head>
   <body>
+    <audio
+      id="type-sound"
+      src="assets/textaudio.ogg"
+      loop
+      data-total="4000"
+    ></audio>
     <div class="error">
       <p>
         I should have
-        <a href="index.html" style="color: rgb(25, 25, 255)">never</a> stopped
-        talking to them.
+        <a href="chat-room.html" style="color: rgb(255, 0, 0)">never</a>
+        stopped talking to them.
       </p>
     </div>
+    <script src="script.js"></script>
   </body>
 </html>

@@ -44,59 +44,24 @@
           border-color: rgb(255, 255, 255);
         }
       }
-
-      @keyframes button-blink {
-        0% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.3;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-
-      .circle-button {
-        position: fixed;
-        right: 50px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 60px;
-        height: 60px;
-        background-color: white;
-        border-radius: 50%;
-        cursor: pointer;
-
-        animation: button-blink 1.5s ease-in-out infinite;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 2s ease-in-out;
-      }
-
-      .show-button {
-        opacity: 1;
-        visibility: visible;
-      }
     </style>
     <title>error</title>
   </head>
   <body>
+    <audio
+      id="type-sound"
+      src="assets/textaudio.ogg"
+      loop
+      data-pause-start="3600"
+      data-pause-end="4800"
+      data-total="6000"
+    ></audio>
     <div class="error">
       <p>[you scroll through the messages. you pause...]</p>
     </div>
     <a href="page-6.html">
       <button class="circle-button"></button>
     </a>
-
-    <script>
-      window.addEventListener("load", () => {
-        const buttonLink = document.querySelector(".circle-button");
-
-        setTimeout(() => {
-          buttonLink.classList.add("show-button");
-        }, 7000);
-      });
-    </script>
+    <script src="script.js"></script>
   </body>
 </html>

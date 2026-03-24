@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="refresh" content="13; eating.html" />
     <link rel="stylesheet" href="style-4.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,34 +22,43 @@
       }
 
       .line-1 {
-        --w: 11ch;
+        --w: 8ch;
         animation:
-          typing 1.5s steps(11) 0s both,
+          typing 1.5s steps(8) 0s both,
           blink-caret 0.75s step-end 0s infinite,
-          hide-caret 0s forwards 1.5s;
+          hide-caret 0s forwards 2s;
       }
 
       .line-2 {
-        --w: 12ch;
+        --w: 41ch;
         animation:
-          typing 1.5s steps(12) 2s both,
+          typing 2.5s steps(41) 2s both,
           blink-caret 0.75s step-end 2s infinite,
-          hide-caret 0s forwards 3.5s;
+          hide-caret 0s forwards 4.5s;
       }
 
       .line-3 {
-        --w: 36ch;
+        --w: 19ch;
         animation:
-          typing 3s steps(36) 3.5s both,
-          blink-caret 0.75s step-end 3.5s infinite,
-          hide-caret 0s forwards 6.5s;
+          typing 2s steps(19) 5s both,
+          blink-caret 0.75s step-end 5s infinite,
+          hide-caret 0s forwards 7.5s;
       }
 
       .line-4 {
+        --w: 16ch;
+        animation:
+          typing 2s steps(16) 7s both,
+          blink-caret 0.75s step-end 7s infinite,
+          hide-caret 0s forwards 9.5s;
+        transition: width 0.3s ease;
+      }
+
+      .line-5 {
         --w: 11ch;
         animation:
-          typing 1s steps(11) 6.8s both,
-          blink-caret 0.75s step-end 6.8s infinite;
+          typing 2s steps(11) 9s both,
+          blink-caret 0.75s step-end 9s infinite;
         transition: width 0.3s ease;
       }
 
@@ -88,36 +98,15 @@
   </head>
   <body>
     <div class="texts">
-      <p class="line-1">THEM: heyyy</p>
-      <p class="line-2">YOU: heyyy :-)</p>
-      <p class="line-3">THEM: we're still on for tomorrow right?</p>
-      <p class="line-4">YOU: <span class="lie">yes ofc!</span></p>
+      <p class="line-1">THEM: hey</p>
+      <p class="line-2">
+        YOU: hi sorry about today
+        <span style="color: red"> i guess i overslept haha</span>
+      </p>
+      <p class="line-3">THEM: nws, next week?</p>
+      <p class="line-4">YOU: yesss, dinner?</p>
+      <p class="line-5">THEM: sure :)</p>
     </div>
-    <script>
-      const target = document.querySelector(".lie");
-
-      target.addEventListener(
-        "mouseenter",
-        () => {
-          const newText =
-            "honestly, i've been feeling really tired recently and it's been hard to get out of bed.";
-
-          target.innerHTML = newText;
-
-          target.classList.add("corrupted");
-
-          const parentP = target.closest("p");
-          parentP.style.width = "auto";
-          parentP.style.whiteSpace = "normal";
-          parentP.style.borderRight = "none";
-          parentP.style.animation = "none";
-
-          setTimeout(() => {
-            window.location.href = "train.html";
-          }, 3000);
-        },
-        { once: true },
-      );
-    </script>
+    <script></script>
   </body>
 </html>

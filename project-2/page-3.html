@@ -21,10 +21,10 @@
       }
 
       @keyframes typing {
-        from {
+        0% {
           width: 0;
         }
-        to {
+        100% {
           width: 30ch;
         }
       }
@@ -42,11 +42,19 @@
     <title>error</title>
   </head>
   <body>
+    <audio
+      id="type-sound"
+      src="assets/textaudio.ogg"
+      loop
+      data-total="3000"
+    ></audio>
     <div class="error">
       <p>
         What are you
-        <a href="index.html" style="color: rgb(25, 25, 255)">running</a> from?
+        <a href="chat-room.html" style="color: rgb(255, 0, 0)">running</a>
+        from?
       </p>
     </div>
+    <script src="script.js"></script>
   </body>
 </html>

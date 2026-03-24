@@ -1,0 +1,44 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+}
+
+.texts {
+    font-family: "Pixelify Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    color: white;
+    font-size: 25px;
+}
+
+.lie {
+    color: #ffffff;
+    animation: pulse 2s infinite;
+}
+
+.corrupted {
+  color: #ff0000;
+  font-weight: bold;
+  text-decoration: none;
+  animation: none;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        color: red;
+    }
+    50% {
+        transform: scale(1.1);
+        color: rgb(255, 90, 90);
+        text-shadow: 0 0 15px red;
+    }
+    100% {
+        transform: scale(1);
+        color: red;
+    }
+}

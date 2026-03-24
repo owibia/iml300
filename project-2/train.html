@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style-5.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <video autoplay muted loop class="video">
+        <source src="assets/train.mp4" type="video/mp4" />
+      </video>
+      <button class="circle-button">Hurry! Get up and catch the train</button>
+    </div>
+    <div class="timer">
+      <div class="timer-bar"></div>
+    </div>
+    <script>
+      const enterBtn = document.querySelector(".circle-button");
+      const timer = document.querySelector(".timer");
+      const timerBar = document.querySelector(".timer-bar");
+
+      if (enterBtn) {
+        enterBtn.addEventListener("click", () => {
+          if (enterBtn.classList.contains("error")) return;
+
+          enterBtn.classList.add("error");
+          const originalText = enterBtn.innerHTML;
+          enterBtn.innerHTML = "i can't";
+
+          setTimeout(() => {
+            enterBtn.classList.remove("error");
+            enterBtn.innerHTML = originalText;
+          }, 1000);
+
+          timer.style.display = "block";
+
+          setTimeout(() => {
+            timerBar.style.width = "0%";
+          }, 50);
+
+          setTimeout(() => {
+            window.location.href = "page-7.html";
+          }, 5000);
+        });
+      }
+    </script>
+  </body>
+</html>
