@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lemna minor — Duckweed Pond</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --pond-deep: #050e07;
+        --pond-mid: #0d1f10;
+        --pond-light: #163a1c;
+        --frond-green: #3a8a42;
+        --accent: #5ecb6a;
+        --gold: #c8943a;
+        --text-dim: #2e5a34;
+        --text-mid: #5a8a5e;
+        --text-bright: #b8d8bc;
+        --panel-bg: rgba(5, 12, 6, 0.88);
+        --panel-border: rgba(40, 90, 44, 0.45);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--pond-deep);
+        overflow: hidden;
+        font-family: "DM Mono", monospace;
+        cursor: crosshair;
+      }
+
+      canvas {
+        display: block;
+      }
+
+      /* ─── Grain overlay ─── */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.55;
+      }
+
+      /* ─── UI layer ─── */
+      #ui {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      /* ─── Title ─── */
+      #title {
+        position: absolute;
+        top: 28px;
+        left: 32px;
+      }
+      #title h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 300;
+        font-style: italic;
+        font-size: 3.75rem;
+        color: var(--text-bright);
+        letter-spacing: 0.03em;
+        line-height: 1;
+      }
+      #title h1 em {
+        font-style: normal;
+        font-weight: 500;
+        color: var(--accent);
+      }
+      #title .sub {
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        margin-top: 7px;
+      }
+
+      /* ─── Hint ─── */
+      #hint {
+        position: absolute;
+        bottom: 32px;
+        left: 32px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        line-height: 2.2;
+      }
+      #hint span {
+        display: block;
+      }
+      #hint span::before {
+        content: "— ";
+      }
+
+      /* ─── Floating sparkle text on harvest ─── */
+      .floatup {
+        position: fixed;
+        pointer-events: none;
+        z-index: 50;
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        animation: floatUp 1.1s ease-out forwards;
+      }
+      @keyframes floatUp {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-44px) scale(0.85);
+        }
+      }
+
+      /* ─── Panel base ─── */
+      .panel {
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 3px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow:
+          0 12px 48px rgba(0, 0, 0, 0.7),
+          inset 0 1px 0 rgba(94, 203, 106, 0.06);
+      }
+
+      .panel-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(40, 90, 44, 0.25);
+      }
+      .panel-label em {
+        color: var(--accent);
+        font-style: normal;
+      }
+
+      /* ─── Basket panel ─── */
+      #basket-panel {
+        position: absolute;
+        bottom: 28px;
+        right: 28px;
+        width: 210px;
+        pointer-events: all;
+      }
+      #basket-box {
+        padding: 16px 18px 18px;
+      }
+
+      #basket-dots {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        min-height: 28px;
+        margin-bottom: 10px;
+      }
+
+      .basket-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+        transition: transform 0.2s;
+        animation: dotPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes dotPop {
+        from {
+          transform: scale(0);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+
+      #basket-count {
+        font-size: 0.58rem;
+        color: var(--text-mid);
+        letter-spacing: 0.15em;
+        margin-bottom: 12px;
+      }
+      #basket-count strong {
+        color: var(--accent);
+        font-weight: 400;
+      }
+
+      /* Progress bar */
+      #progress-bar-wrap {
+        height: 2px;
+        background: rgba(40, 90, 44, 0.2);
+        border-radius: 2px;
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+      #progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--frond-green), var(--accent));
+        transition: width 0.4s ease;
+        border-radius: 2px;
+      }
+
+      /* Craft button */
+      #craft-btn {
+        width: 100%;
+        padding: 11px 0;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 0.92rem;
+        letter-spacing: 0.12em;
+        font-weight: 500;
+        background: linear-gradient(
+          135deg,
+          #1c5e28 0%,
+          #2e8a42 60%,
+          #3aaa50 100%
+        );
+        color: #d8f0d0;
+        display: none;
+        box-shadow:
+          0 0 0 1px rgba(94, 203, 106, 0.2),
+          0 4px 20px rgba(10, 60, 20, 0.5);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+      #craft-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          transparent 40%,
+          rgba(255, 255, 255, 0.07)
+        );
+      }
+      #craft-btn:hover {
+        transform: translateY(-1px);
+        box-shadow:
+          0 0 0 1px rgba(94, 203, 106, 0.4),
+          0 6px 24px rgba(10, 60, 20, 0.7);
+      }
+      #craft-btn:active {
+        transform: translateY(0);
+      }
+      #craft-btn.visible {
+        display: block;
+        animation: fadeSlideIn 0.3s ease;
+      }
+      @keyframes fadeSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      #basket-box.ready {
+        border-color: rgba(94, 203, 106, 0.6);
+        box-shadow:
+          0 12px 48px rgba(0, 0, 0, 0.7),
+          0 0 0 1px rgba(94, 203, 106, 0.15),
+          0 0 24px rgba(94, 203, 106, 0.12);
+        animation: readyPulse 2s ease-in-out infinite;
+      }
+      @keyframes readyPulse {
+        0%,
+        100% {
+          box-shadow:
+            0 12px 48px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(94, 203, 106, 0.15),
+            0 0 20px rgba(94, 203, 106, 0.1);
+        }
+        50% {
+          box-shadow:
+            0 12px 48px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(94, 203, 106, 0.4),
+            0 0 36px rgba(94, 203, 106, 0.22);
+        }
+      }
+
+      #craft-cost {
+        font-size: 0.5rem;
+        color: var(--text-dim);
+        text-align: center;
+        margin-top: 6px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        display: none;
+      }
+
+      /* ─── Inventory panel ─── */
+      #inventory-panel {
+        position: absolute;
+        top: 28px;
+        right: 28px;
+        width: 220px;
+        pointer-events: all;
+      }
+      #inventory-box {
+        padding: 16px 18px;
+        max-height: 68vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--text-dim) transparent;
+      }
+      #inventory-box::-webkit-scrollbar {
+        width: 3px;
+      }
+      #inventory-box::-webkit-scrollbar-thumb {
+        background: var(--text-dim);
+        border-radius: 3px;
+      }
+
+      .inv-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        margin-bottom: 11px;
+        padding-bottom: 11px;
+        border-bottom: 1px solid rgba(30, 60, 34, 0.5);
+        animation: itemIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
+      }
+      .inv-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      @keyframes itemIn {
+        from {
+          opacity: 0;
+          transform: translateX(10px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .inv-icon {
+        font-size: 1.6rem;
+        flex-shrink: 0;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+      }
+      .inv-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .inv-name {
+        font-family: "Cormorant Garamond", serif;
+        color: #c8e0c0;
+        font-size: 0.82rem;
+        font-weight: 500;
+        line-height: 1.2;
+        margin-bottom: 3px;
+      }
+      .inv-desc {
+        color: var(--text-dim);
+        font-size: 0.54rem;
+        line-height: 1.5;
+        margin-bottom: 4px;
+      }
+      .inv-rarity {
+        font-size: 0.46rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+      }
+      .rarity-common {
+        color: #6a8a6a;
+      }
+      .rarity-uncommon {
+        color: #5ab87a;
+      }
+      .rarity-rare {
+        color: #5aabcc;
+      }
+      .rarity-legendary {
+        color: #e8a83a;
+      }
+
+      #inventory-empty {
+        color: var(--text-dim);
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+        line-height: 1.8;
+        font-style: italic;
+        font-family: "Cormorant Garamond", serif;
+      }
+
+      /* ─── Modal ─── */
+      #craft-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 8, 3, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.35s;
+        backdrop-filter: blur(4px);
+      }
+      #craft-modal.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      #craft-card {
+        background: linear-gradient(160deg, #0d2214 0%, #060e08 100%);
+        border: 1px solid var(--panel-border);
+        border-radius: 4px;
+        padding: 42px 44px 34px;
+        text-align: center;
+        max-width: 340px;
+        width: 90%;
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.9),
+          0 0 60px rgba(20, 80, 30, 0.15),
+          inset 0 1px 0 rgba(94, 203, 106, 0.08);
+        transform: scale(0.85) translateY(20px);
+        transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+      }
+      #craft-modal.show #craft-card {
+        transform: scale(1) translateY(0);
+      }
+
+      #modal-shimmer {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 0%,
+          rgba(94, 203, 106, 0.06) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+        border-radius: 4px;
+      }
+
+      #craft-reveal-icon {
+        font-size: 4.5rem;
+        display: block;
+        margin-bottom: 18px;
+        animation: iconReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        filter: drop-shadow(0 0 20px rgba(94, 203, 106, 0.3));
+      }
+      @keyframes iconReveal {
+        0% {
+          transform: rotate(-15deg) scale(0.4);
+          opacity: 0;
+          filter: blur(8px);
+        }
+        100% {
+          transform: rotate(0) scale(1);
+          opacity: 1;
+          filter: blur(0);
+        }
+      }
+
+      #craft-reveal-rarity {
+        font-size: 0.52rem;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        font-family: "DM Mono", monospace;
+      }
+      #craft-reveal-name {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #d8f0d0;
+        margin-bottom: 12px;
+        line-height: 1.2;
+      }
+      #craft-reveal-desc {
+        font-size: 0.75rem;
+        color: var(--text-mid);
+        line-height: 1.8;
+        margin-bottom: 26px;
+        font-family: "Cormorant Garamond", serif;
+        font-style: italic;
+      }
+      #craft-close {
+        padding: 10px 32px;
+        background: transparent;
+        color: var(--text-mid);
+        border: 1px solid var(--panel-border);
+        border-radius: 2px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.25s;
+      }
+      #craft-close:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        box-shadow: 0 0 20px rgba(94, 203, 106, 0.15);
+      }
+
+      /* ─── Rarity ring on modal ─── */
+      .ring-common {
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.9),
+          0 0 40px rgba(106, 138, 106, 0.12) !important;
+      }
+      .ring-uncommon {
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.9),
+          0 0 40px rgba(90, 184, 122, 0.18) !important;
+      }
+      .ring-rare {
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.9),
+          0 0 40px rgba(90, 171, 204, 0.25) !important;
+      }
+      .ring-legendary {
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.9),
+          0 0 60px rgba(232, 168, 58, 0.35) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+
+    <div id="ui">
+      <!-- Title -->
+      <div id="title">
+        <h1><em>Lemna</em> minor</h1>
+        <p class="sub">Common Duckweed · Pond Simulation</p>
+      </div>
+
+      <!-- Hint -->
+      <div id="hint">
+        <span>Click duckweed to harvest</span>
+        <span>Collect 10 fronds to craft</span>
+        <span>New fronds grow over time</span>
+      </div>
+
+      <!-- Basket -->
+      <div id="basket-panel">
+        <div id="basket-box" class="panel">
+          <div class="panel-label"><em>◆</em> Harvest Basket</div>
+          <div id="basket-dots"></div>
+          <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+          <div id="basket-count">
+            <strong id="count-num">0</strong> / 10 fronds
+          </div>
+          <button id="craft-btn">✦ Craft Item</button>
+          <div id="craft-cost">Uses 10 fronds</div>
+        </div>
+      </div>
+
+      <!-- Inventory -->
+      <div id="inventory-panel">
+        <div id="inventory-box" class="panel">
+          <div class="panel-label"><em>⚗</em> Crafted Items</div>
+          <div id="inventory-list">
+            <div id="inventory-empty">
+              Nothing crafted yet.<br />Harvest fronds from the pond…
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="craft-modal">
+      <div id="craft-card">
+        <div id="modal-shimmer"></div>
+        <span id="craft-reveal-icon">🌿</span>
+        <div id="craft-reveal-rarity"></div>
+        <div id="craft-reveal-name"></div>
+        <div id="craft-reveal-desc"></div>
+        <button id="craft-close">Keep it</button>
+      </div>
+    </div>
+
+    <script>
+      // ─── Crafting Table ───────────────────────────────────────
+      const CRAFT_COST = 10;
+
+      const ITEMS = [
+        {
+          name: "Duckweed Tea",
+          icon: "🍵",
+          rarity: "common",
+          desc: "A warm, slightly grassy brew. Surprisingly calming.",
+        },
+        {
+          name: "Pond Poultice",
+          icon: "🩹",
+          rarity: "common",
+          desc: "A cool green paste. Soothes minor cuts and sunburns.",
+        },
+        {
+          name: "Weed Rope",
+          icon: "🪢",
+          rarity: "common",
+          desc: "Braided duckweed strands. Weak, but better than nothing.",
+        },
+        {
+          name: "Green Ink",
+          icon: "🖊️",
+          rarity: "common",
+          desc: "A murky emerald ink pressed from fronds.",
+        },
+        {
+          name: "Frog Lure",
+          icon: "🐸",
+          rarity: "common",
+          desc: "Frogs love this. Attracts them from across the pond.",
+        },
+        {
+          name: "Pond Pillow",
+          icon: "🛏️",
+          rarity: "common",
+          desc: "Dried and stuffed. Smells like summer rain.",
+        },
+        {
+          name: "Algae Candle",
+          icon: "🕯️",
+          rarity: "uncommon",
+          desc: "Burns with a soft green hue. Scent of moss and rain.",
+        },
+        {
+          name: "Pond Soap",
+          icon: "🧼",
+          rarity: "uncommon",
+          desc: "Rich lather with a fresh, earthy fragrance.",
+        },
+        {
+          name: "Chlorophyll Dye",
+          icon: "🎨",
+          rarity: "uncommon",
+          desc: "A vivid green dye that doesn't fade in sunlight.",
+        },
+        {
+          name: "Water Lens",
+          icon: "🔭",
+          rarity: "uncommon",
+          desc: "A tiny pressed lens of dried fronds. Magnifies things oddly.",
+        },
+        {
+          name: "Duck Whistle",
+          icon: "🦆",
+          rarity: "uncommon",
+          desc: "Attracts ducks. Works a little too well.",
+        },
+        {
+          name: "Swamp Compass",
+          icon: "🧭",
+          rarity: "uncommon",
+          desc: "Always points toward the nearest body of water.",
+        },
+        {
+          name: "Pondkeeper's Staff",
+          icon: "🪄",
+          rarity: "rare",
+          desc: "A willow rod wrapped in living duckweed. Pulses gently.",
+        },
+        {
+          name: "Frog Crown",
+          icon: "👑",
+          rarity: "rare",
+          desc: "Woven fronds and lily stems. The frogs approve.",
+        },
+        {
+          name: "Elixir of Calm",
+          icon: "🧪",
+          rarity: "rare",
+          desc: "Drink it. Breathe. The pond hears you.",
+        },
+        {
+          name: "Verdant Cloak",
+          icon: "🧥",
+          rarity: "rare",
+          desc: "Woven from a thousand fronds. Renders you invisible to herons.",
+        },
+        {
+          name: "Bog Map",
+          icon: "🗺️",
+          rarity: "rare",
+          desc: "A living map drawn in algae ink. The trails shift with the tides.",
+        },
+        {
+          name: "Heart of the Pond",
+          icon: "💚",
+          rarity: "legendary",
+          desc: "A perfect sphere of pure duckweed essence. The pond breathes through it.",
+        },
+        {
+          name: "Frog King's Signet",
+          icon: "💍",
+          rarity: "legendary",
+          desc: "Ancient. The Frog King wants it back.",
+        },
+        {
+          name: "The Verdant Tome",
+          icon: "📗",
+          rarity: "legendary",
+          desc: "A book that writes itself. Every page smells like petrichor.",
+        },
+      ];
+
+      function pickItem() {
+        const roll = Math.random();
+        let pool;
+        if (roll < 0.55) pool = ITEMS.filter((i) => i.rarity === "common");
+        else if (roll < 0.83)
+          pool = ITEMS.filter((i) => i.rarity === "uncommon");
+        else if (roll < 0.97) pool = ITEMS.filter((i) => i.rarity === "rare");
+        else pool = ITEMS.filter((i) => i.rarity === "legendary");
+        return pool[Math.floor(Math.random() * pool.length)];
+      }
+
+      const RARITY_COLOR = {
+        common: "#6a8a6a",
+        uncommon: "#5ab87a",
+        rare: "#5aabcc",
+        legendary: "#e8a83a",
+      };
+
+      // ─── Canvas ───────────────────────────────────────────────
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      // ─── Fronds ───────────────────────────────────────────────
+      const GREENS = [
+        "#2a6632",
+        "#377a3e",
+        "#44994a",
+        "#56bc5a",
+        "#2d7238",
+        "#5ec45e",
+        "#1e5026",
+        "#4aaa4e",
+        "#196024",
+        "#6acc6a",
+        "#3a8040",
+        "#22582c",
+      ];
+
+      let fronds = [];
+
+      function makeFrond(x, y) {
+        return {
+          x: x !== undefined ? x : Math.random() * canvas.width,
+          y: y !== undefined ? y : Math.random() * canvas.height,
+          r: 0,
+          targetR: 10 + Math.random() * 38,
+          color: GREENS[Math.floor(Math.random() * GREENS.length)],
+          angle: Math.random() * Math.PI * 2,
+          ox: 0.7 + Math.random() * 0.3,
+          oy: 0.5 + Math.random() * 0.3,
+          wobble: Math.random() * 1000,
+          speed: 0.04 + Math.random() * 0.12,
+          hue: (Math.random() - 0.5) * 20,
+        };
+      }
+
+      for (let i = 0; i < 10; i++) fronds.push(makeFrond());
+
+      let spawnTimer = 0;
+      function spawnFrond() {
+        if (fronds.length === 0 || Math.random() < 0.2) {
+          fronds.push(makeFrond());
+        } else {
+          const p = fronds[Math.floor(Math.random() * fronds.length)];
+          const a = Math.random() * Math.PI * 2;
+          const d = p.targetR * (0.5 + Math.random() * 2);
+          const nx = p.x + Math.cos(a) * d,
+            ny = p.y + Math.sin(a) * d;
+          if (nx > 0 && nx < canvas.width && ny > 0 && ny < canvas.height)
+            fronds.push(makeFrond(nx, ny));
+        }
+      }
+
+      function drawFrond(f, t) {
+        const wob = Math.sin(t * 0.011 + f.wobble) * 1.4;
+        const wob2 = Math.cos(t * 0.008 + f.wobble) * 0.7;
+        ctx.save();
+        ctx.translate(f.x + wob, f.y + wob2);
+        ctx.rotate(f.angle + Math.sin(t * 0.007 + f.wobble) * 0.04);
+        const rx = f.r * f.ox,
+          ry = f.r * f.oy;
+
+        // Shadow
+        ctx.beginPath();
+        ctx.ellipse(2, 3, rx * 1.08, ry * 1.08, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+        ctx.fill();
+
+        // Main body
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fillStyle = f.color;
+        ctx.fill();
+
+        // Specular highlight
+        ctx.beginPath();
+        ctx.ellipse(
+          -rx * 0.22,
+          -ry * 0.22,
+          rx * 0.42,
+          ry * 0.35,
+          0,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fillStyle = "rgba(255,255,255,0.11)";
+        ctx.fill();
+
+        // Midrib
+        if (f.r > 7) {
+          ctx.beginPath();
+          ctx.moveTo(0, -ry * 0.78);
+          ctx.bezierCurveTo(rx * 0.08, 0, -rx * 0.04, ry * 0.42, 0, ry * 0.78);
+          ctx.strokeStyle = "rgba(255,255,255,0.18)";
+          ctx.lineWidth = Math.max(0.4, f.r * 0.035);
+          ctx.stroke();
+
+          // Side veins
+          if (f.r > 14) {
+            for (let s of [-1, 1]) {
+              ctx.beginPath();
+              ctx.moveTo(0, -ry * 0.3);
+              ctx.quadraticCurveTo(s * rx * 0.55, 0, s * rx * 0.7, ry * 0.25);
+              ctx.strokeStyle = "rgba(255,255,255,0.08)";
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Rim
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(0,0,0,0.18)";
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function hitTest(f, mx, my) {
+        const dx = mx - f.x,
+          dy = my - f.y;
+        const cos = Math.cos(-f.angle),
+          sin = Math.sin(-f.angle);
+        const lx = dx * cos - dy * sin,
+          ly = dx * sin + dy * cos;
+        return (lx / (f.r * f.ox)) ** 2 + (ly / (f.r * f.oy)) ** 2 <= 1.3;
+      }
+
+      // ─── Basket UI ────────────────────────────────────────────
+      const basketDots = document.getElementById("basket-dots");
+      const countNum = document.getElementById("count-num");
+      const craftBtn = document.getElementById("craft-btn");
+      const craftCost = document.getElementById("craft-cost");
+      const progressBar = document.getElementById("progress-bar");
+      let harvested = 0;
+      let totalCrafted = 0;
+
+      function updateBasketUI() {
+        countNum.textContent = harvested;
+        const pct = Math.min(100, (harvested / CRAFT_COST) * 100);
+        progressBar.style.width = pct + "%";
+        if (harvested >= CRAFT_COST) {
+          document.getElementById("basket-box").classList.add("ready");
+          craftBtn.classList.add("visible");
+          craftCost.style.display = "block";
+        } else {
+          craftBtn.classList.remove("visible");
+          craftCost.style.display = "none";
+          document.getElementById("basket-box").classList.remove("ready");
+        }
+      }
+
+      function spawnFloatText(x, y, text) {
+        const el = document.createElement("div");
+        el.className = "floatup";
+        el.textContent = text;
+        el.style.left = x - 20 + "px";
+        el.style.top = y - 20 + "px";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1200);
+      }
+
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left,
+          my = e.clientY - rect.top;
+        for (let i = fronds.length - 1; i >= 0; i--) {
+          if (fronds[i].r > 3 && hitTest(fronds[i], mx, my)) {
+            const f = fronds.splice(i, 1)[0];
+            harvested++;
+
+            const dot = document.createElement("div");
+            dot.className = "basket-dot";
+            const size = Math.max(6, Math.min(16, f.r * 0.45));
+            dot.style.cssText += `width:${size}px;height:${size}px;background:${f.color};`;
+            basketDots.appendChild(dot);
+
+            spawnFloatText(e.clientX, e.clientY, "+1 frond");
+            updateBasketUI();
+            break;
+          }
+        }
+      });
+
+      // ─── Crafting ─────────────────────────────────────────────
+      const modal = document.getElementById("craft-modal");
+      const craftCard = document.getElementById("craft-card");
+      const revealIcon = document.getElementById("craft-reveal-icon");
+      const revealRarity = document.getElementById("craft-reveal-rarity");
+      const revealName = document.getElementById("craft-reveal-name");
+      const revealDesc = document.getElementById("craft-reveal-desc");
+      const craftClose = document.getElementById("craft-close");
+      const inventoryList = document.getElementById("inventory-list");
+      const inventoryEmpty = document.getElementById("inventory-empty");
+
+      let lastCraftedItem = null;
+
+      craftBtn.addEventListener("click", () => {
+        if (harvested < CRAFT_COST) return;
+
+        harvested -= CRAFT_COST;
+        const dots = basketDots.querySelectorAll(".basket-dot");
+        for (let i = 0; i < CRAFT_COST && i < dots.length; i++)
+          dots[i].remove();
+        updateBasketUI();
+
+        const item = pickItem();
+        lastCraftedItem = item;
+
+        revealIcon.textContent = item.icon;
+        revealRarity.textContent = item.rarity;
+        revealRarity.style.color = RARITY_COLOR[item.rarity];
+        revealName.textContent = item.name;
+        revealName.style.color = RARITY_COLOR[item.rarity];
+        revealDesc.textContent = item.desc;
+
+        craftCard.className = "";
+        craftCard.classList.add("ring-" + item.rarity);
+
+        modal.classList.add("show");
+      });
+
+      function closeModal() {
+        modal.classList.remove("show");
+        if (lastCraftedItem) {
+          addToInventory(lastCraftedItem);
+          totalCrafted++;
+          lastCraftedItem = null;
+        }
+      }
+
+      craftClose.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      function addToInventory(item) {
+        if (inventoryEmpty) inventoryEmpty.remove();
+        const el = document.createElement("div");
+        el.className = "inv-item";
+        el.innerHTML = `
+    <div class="inv-icon">${item.icon}</div>
+    <div class="inv-info">
+      <div class="inv-name">${item.name}</div>
+      <div class="inv-desc">${item.desc}</div>
+      <div class="inv-rarity rarity-${item.rarity}">${item.rarity}</div>
+    </div>`;
+        inventoryList.prepend(el);
+      }
+
+      // ─── Ripples ──────────────────────────────────────────────
+      let ripples = [];
+      setInterval(() => {
+        ripples.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 0,
+          a: 0.3,
+          speed: 0.7 + Math.random() * 0.5,
+        });
+      }, 2800);
+
+      // Interact ripple on click
+      canvas.addEventListener("mousedown", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        ripples.push({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+          r: 0,
+          a: 0.5,
+          speed: 1.4,
+        });
+      });
+
+      // ─── Background: caustics ─────────────────────────────────
+      let causticT = 0;
+      function drawBackground() {
+        causticT += 0.003;
+        const grad = ctx.createRadialGradient(
+          canvas.width * 0.45,
+          canvas.height * 0.45,
+          0,
+          canvas.width * 0.5,
+          canvas.height * 0.5,
+          Math.max(canvas.width, canvas.height) * 0.72,
+        );
+        grad.addColorStop(0, "#132518");
+        grad.addColorStop(0.5, "#0a1a0d");
+        grad.addColorStop(1, "#050e07");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Subtle light columns (caustics simulation)
+        ctx.save();
+        ctx.globalAlpha = 0.025;
+        for (let i = 0; i < 6; i++) {
+          const cx =
+            canvas.width * (0.1 + i * 0.16) + Math.sin(causticT + i * 1.2) * 40;
+          const g = ctx.createRadialGradient(
+            cx,
+            canvas.height * 0.3,
+            0,
+            cx,
+            canvas.height * 0.5,
+            200,
+          );
+          g.addColorStop(0, "#5ec86a");
+          g.addColorStop(1, "transparent");
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.restore();
+      }
+
+      // ─── Main loop ────────────────────────────────────────────
+      let tick = 0;
+      function loop() {
+        tick++;
+        requestAnimationFrame(loop);
+
+        drawBackground();
+
+        // Ripples
+        ripples = ripples.filter((r) => r.a > 0);
+        for (const r of ripples) {
+          ctx.beginPath();
+          ctx.ellipse(r.x, r.y, r.r, r.r * 0.32, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(80,168,92,${r.a})`;
+          ctx.lineWidth = 0.9;
+          ctx.stroke();
+          r.r += r.speed;
+          r.a -= 0.005;
+        }
+
+        for (const f of fronds) {
+          if (f.r < f.targetR) f.r += f.speed * (f.targetR - f.r + 0.3);
+          drawFrond(f, tick);
+        }
+
+        spawnTimer++;
+        if (spawnTimer > Math.max(18, 65 - fronds.length * 0.28)) {
+          spawnTimer = 0;
+          spawnFrond();
+        }
+      }
+
+      loop();
+    </script>
+  </body>
+</html>
