@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Immigration</title>
+
+    <style>
+      body {
+        margin: 0;
+        background: #ffffff;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        margin: auto;
+      }
+
+      img {
+        width: 100%;
+        display: block;
+      }
+
+      svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .person {
+        fill: transparent;
+        cursor: pointer;
+      }
+
+      .person:hover {
+        fill: transparent;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <img src="assets/landing.png" alt="Landing Page" />
+
+      <svg viewBox="0 0 640 960">
+        <rect
+          class="person"
+          x="460"
+          y="260"
+          width="70"
+          height="120"
+          data-link="page-1.html"
+        />
+
+        <rect
+          class="person"
+          x="38"
+          y="755"
+          width="60"
+          height="150"
+          data-link="page-2.html"
+        />
+
+        <rect
+          class="person"
+          x="510"
+          y="670"
+          width="80"
+          height="120"
+          data-link="page-3.html"
+        />
+      </svg>
+    </div>
+
+    <script>
+      document.querySelectorAll(".person").forEach((el) => {
+        el.addEventListener("click", () => {
+          window.location.href = el.dataset.link;
+        });
+      });
+    </script>
+  </body>
+</html>
